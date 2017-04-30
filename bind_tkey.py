@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2013-2016 TangScan developers (http://www.wooyun.org/)
-author: fate0 <fate0@wooyun.org>
 """
 
 from __future__ import print_function, absolute_import
