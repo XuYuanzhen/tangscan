@@ -15,9 +15,11 @@ random_url = ''.join(random.SystemRandom().choice(string.ascii_lowercase + strin
 seed = "6cc3545f1d476b4b4e9f0785b4811be5"
 
 
+
 class TangScan(TSExploit):
     """
     类名必须是TangScan，而且需要继承于TSExploit
+
     """
     def __init__(self):
         super(self.__class__, self).__init__()
